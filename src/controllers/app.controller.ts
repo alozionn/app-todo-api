@@ -1,13 +1,18 @@
 import { Body, Controller, Get, Patch, Post } from '@nestjs/common'
 import { Delete, Param } from '@nestjs/common/decorators'
-import { Todo } from '@prisma/client'
+import { Todo, User } from '@prisma/client'
 import { TodoService } from 'src/services/todo.service'
+import { UserService } from 'src/services/user.service'
 
 @Controller()
 export class AppController {
-  constructor(private readonly todoService: TodoService) {}
+  constructor(
+    private readonly todoService: TodoService,
+    private readonly userService: UserService,
+  ) {}
 
-  @Get('/todos')
+  // TODOSERVICE
+  @Get('/listTodos')
   async getAllTodos(): Promise<Todo[]> {
     return this.todoService.getTodos({
       orderBy: {
@@ -36,7 +41,7 @@ export class AppController {
     })
   }
 
-  @Post('/todo')
+  @Post('/createTodo')
   async createTodo(@Body() data: { name: string }): Promise<Todo> {
     return this.todoService.createTodo(data)
   }
@@ -49,8 +54,38 @@ export class AppController {
     })
   }
 
+  @Patch('/markTodoCompleted')
+  async markTodoCompleted(@Body() data: { id: number }) {
+    return this.todoService.updateTodo({
+      where: { id: Number(data.id) },
+      data: { completed: true },
+    })
+  }
+
+  @Patch('/markTodoUncompleted')
+  async markTodoUncompleted(@Body() data: { id: number }) {
+    return this.todoService.updateTodo({
+      where: { id: Number(data.id) },
+      data: { completed: false },
+    })
+  }
+
   @Delete('/todo/:id')
   async deleteTodo(@Param('id') id: number): Promise<Todo> {
     return this.todoService.deleteTodo({ id: Number(id) })
   }
+
+  // TODOSERVICE
+
+  // USERSERVICE
+  @Post('/signUp')
+  async signUp(@Body() data: { name: string; email: string; password: string }): Promise<User> {
+    return this.userService.createUser(data)
+  }
+
+  @Post('/login')
+  async login(@Body() data: { email: string; password: string }): Promise<User> {
+    return this.userService.createUser(data)
+  }
+  // USERSERVICE
 }
