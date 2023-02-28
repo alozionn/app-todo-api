@@ -9,19 +9,31 @@ export class AppController {
 
   @Get('/todos')
   async getAllTodos(): Promise<Todo[]> {
-    return this.todoService.getTodos({})
+    return this.todoService.getTodos({
+      orderBy: {
+        id: 'asc',
+      },
+    })
   }
 
   @Get('/todos/uncompleted')
   async getUncompletedTodos(): Promise<Todo[]> {
     return this.todoService.getTodos({
       where: { completed: false },
+      orderBy: {
+        id: 'asc',
+      },
     })
   }
 
   @Get('/todos/completed')
   async getCompletedTodos(): Promise<Todo[]> {
-    return this.todoService.getTodos({ where: { completed: true } })
+    return this.todoService.getTodos({
+      where: { completed: true },
+      orderBy: {
+        id: 'asc',
+      },
+    })
   }
 
   @Post('/todo')
