@@ -1,14 +1,17 @@
-import { Body, Controller, Get, Patch, Post } from '@nestjs/common'
+import { Body, Controller, Get, Patch, Post, Request, UseGuards } from '@nestjs/common'
 import { Delete, Param } from '@nestjs/common/decorators'
 import { Todo, User } from '@prisma/client'
 import { TodoService } from 'src/services/todo.service'
 import { UserService } from 'src/services/user.service'
+import { LocalAuthGuard } from 'src/local-auth.guard'
+import { AuthService } from 'src/services/auth.service'
 
 @Controller()
 export class AppController {
   constructor(
     private readonly todoService: TodoService,
     private readonly userService: UserService,
+    private readonly authService: AuthService,
   ) {}
 
   // TODOSERVICE
@@ -83,9 +86,10 @@ export class AppController {
     return this.userService.createUser(data)
   }
 
+  @UseGuards(LocalAuthGuard)
   @Post('/login')
-  async login(@Body() data: { email: string; password: string }): Promise<User> {
-    return this.userService.createUser(data)
+  async login(@Request() req) {
+    return this.authService.login(req.user)
   }
   // USERSERVICE
 }
